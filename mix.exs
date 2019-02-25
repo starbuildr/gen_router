@@ -35,7 +35,7 @@ defmodule GenRouter.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      #{:vex, "~>0.8"}
+      {:ex_doc, ">= 0.0.0", only: :dev}
     ]
   end
 
