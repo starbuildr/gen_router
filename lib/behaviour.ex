@@ -1,4 +1,4 @@
-defprotocol GenRouter.Behaviour do
+defmodule GenRouter.Behaviour do
   @moduledoc """
   Callbacks for custom implementation for the Router.
   """
