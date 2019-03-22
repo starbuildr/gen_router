@@ -23,6 +23,11 @@ end
 
 Router configuration is similar to Phoenix routing system, but we don't support HTTP methods and define only `match` rules.
 
+As with Phoenix, you can capture variables in `conn.params` with colon notations.
+Route `/book/:name/p/:page` will match url like `/book/sweet_home/p/3` and will populate
+params of your `conn` object with `%{"name" => "sweet_home", "page" => "3"}`. 
+All the parsed values will be strings.
+
 You need to define `match_message` and `deliver` callbacks according to `GenRouter.Behaviour` behviour.
 
 ### match_message
@@ -66,15 +71,15 @@ defmodule App.Router do
   scope :default, "/" do
     pipe_through [:authed]
 
-    match "/", FirstController, :action1
-    match "/action2", FirstController, :action2
-    match "/model3", FirstController, :action3
+    match "/", FirstController, :index
+    match "/action2", FirstController, :index
+    match "/model3/:id", FirstController, :protected_action
   end
 
   scope :model4_scope, "/model4" do
     pipe_through [:authed]
 
-    match "/", Model4Controller, :index
+    match "/", FirstController, :index
   end
 
   match "*", ErrorController, :not_found
@@ -101,7 +106,7 @@ end
 ### Sample controller
 
 ```
-defmodule GenRouter.Controller.TestController do
+defmodule GenRouter.Controller.FirstController do
   use GenRouter.Controller
 
   plug GenRouter.Plug.FetchCommonResource

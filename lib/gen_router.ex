@@ -7,33 +7,55 @@ defmodule GenRouter do
   alias GenRouter.Conn
 
   @doc """
-  Match specific route in scope of routes
+  Match specific route in scope of routes.
+
+  We ensure that all paths and suffixs are matched with slash for consistency.
   """
-  @spec match_in_scope(module(), atom(), [{String.t, atom(), atom()}], [atom()], String.t, %Conn{}, Keyword.t) :: %Conn{}
-  def match_in_scope(router_module, scope, routes, scope_pipeline, path_suffix, conn, opts) do
-    Enum.find(routes, :next_scope, fn({path, _controller, _action}) ->
-      path === path_suffix or path === "/#{path_suffix}"
+  @spec match_in_scope(module(), atom(), [{String.t, atom(), atom()}], [atom()], String.t, Conn.t, Keyword.t) :: Conn.t
+  def match_in_scope(router_module, scope, routes, scope_pipeline, "/" <> _ = path_suffix, conn, opts) do
+    Enum.reduce(routes, :next_scope, fn({path, controller, action}, acc) ->
+      if acc === :next_scope do
+        result =
+          case path do
+            %Regex{} = path_regex ->
+              Regex.named_captures(path_regex, path_suffix)
+            _ ->
+              path === path_suffix
+          end
+
+        if result === true or (is_map(result) and not Map.equal?(result, %{})) do
+          conn = if is_map(result), do: %{conn | params: Map.merge(conn.params, result)}, else: conn
+          conn =
+            Enum.reduce(scope_pipeline, conn, fn(pipeline, conn) ->
+              unless conn.halted do
+                apply(router_module, pipeline, [conn, opts])
+              else
+                conn
+              end
+            end)
+
+          unless conn.halted do
+            apply(controller, :do_action, [action, conn, opts])
+          else
+            conn
+          end
+        else
+          :next_scope
+        end
+      else
+        acc
+      end
     end)
     |> case do
-      {_path, controller, action} ->
-        conn =
-          Enum.reduce(scope_pipeline, conn, fn(pipeline, conn) ->
-            unless conn.halted do
-              apply(router_module, pipeline, [conn, opts])
-            else
-              conn
-            end
-          end)
-
-        unless conn.halted do
-          apply(controller, :do_action, [action, conn, opts])
-        else
-          conn
-        end
-      :next_scope ->
+      %Conn{} = conn ->
+        conn
+      _ ->
         conn = %{conn | __skip__: Map.put(conn.__skip__, scope, true)}
         router_module.do_match(conn, opts)
     end
+  end
+  def match_in_scope(router_module, scope, routes, scope_pipeline, path_suffix, conn, opts) do
+    match_in_scope(router_module, scope, routes, scope_pipeline, "/" <> path_suffix, conn, opts)
   end
 
   @doc """
@@ -74,13 +96,23 @@ defmodule GenRouter do
   defmacro match("/", controller, action) do
     quote do
       if routes = @routes do
-        @routes [{"", unquote(controller), unquote(action)} | routes]
+        @routes [{"/", unquote(controller), unquote(action)} | routes]
       else
         raise "cannot define match at the router level, match must be defined inside a scope"
       end
     end
   end
   defmacro match(path, controller, action) do
+    path =
+      if String.contains?(path, ":") do
+        "^" <> path <> "$"
+        |> String.replace(~r/:([0-9a-z_\-]+)/, "(?<\\g{1}>[0-9a-z_\-]+)")
+        |> Regex.compile!()
+        |> Macro.escape()
+      else
+        path
+      end
+
     quote do
       if routes = @routes do
         @routes [{unquote(path), unquote(controller), unquote(action)} | routes]

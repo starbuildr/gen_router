@@ -24,6 +24,11 @@ defmodule GenRouter.Controller.TestController do
     complete(conn, "TEST4")
   end
 
+  @spec test5(GenRouter.Conn.t(), any()) :: GenRouter.Conn.t()
+  def test5(%{params: %{"name" => name, "id" => id}} = conn, _opts) do
+    complete(conn, "#{name}#{id}")
+  end
+
   @spec not_found(GenRouter.Conn.t(), any()) :: GenRouter.Conn.t()
   def not_found(conn, _opts) do
     complete(conn, nil, %{}, 404)

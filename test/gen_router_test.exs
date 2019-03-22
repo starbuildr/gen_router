@@ -85,5 +85,17 @@ defmodule GenRouterTest do
       refute conn.assigns[:user]
       assert conn.assigns.common
     end
+
+    test "for route with params" do
+      msg = %{
+        path: "/test5/acme/i/5",
+        message: %{test: "content"},
+        scope: %{},
+        assigns: %{authorized: true},
+        opts: []
+      }
+      conn = GenRouter.Router.match_message(msg.message, msg.path, msg.scope, msg.assigns, msg.opts)
+      assert conn.response === "acme5"
+    end
   end
 end
