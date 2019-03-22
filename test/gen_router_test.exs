@@ -57,5 +57,33 @@ defmodule GenRouterTest do
       }
       assert GenRouter.Router.match_message(msg.message, msg.path, msg.scope, msg.assigns, msg.opts).response === "TEST2"
     end
+
+    test "for route with guarded plug in controller" do
+      msg = %{
+        path: "/test4",
+        message: %{test: "content"},
+        scope: %{},
+        assigns: %{authorized: true},
+        opts: []
+      }
+      conn = GenRouter.Router.match_message(msg.message, msg.path, msg.scope, msg.assigns, msg.opts)
+      assert conn.response === "TEST4"
+      assert conn.assigns.user
+      assert conn.assigns.common
+    end
+
+    test "for route with unguarded plug in controller" do
+      msg = %{
+        path: "/test2",
+        message: %{test: "content"},
+        scope: %{},
+        assigns: %{authorized: true},
+        opts: []
+      }
+      conn = GenRouter.Router.match_message(msg.message, msg.path, msg.scope, msg.assigns, msg.opts)
+      assert conn.response === "TEST2"
+      refute conn.assigns[:user]
+      assert conn.assigns.common
+    end
   end
 end

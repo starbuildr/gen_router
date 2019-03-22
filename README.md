@@ -50,9 +50,7 @@ Arguments:
 * `params` - rendering params
 * `opts` - delivery options
 
-###
-
-Sample router:
+### Sample router
 
 ```
 defmodule App.Router do
@@ -97,6 +95,42 @@ defmodule App.Router do
   def deliver(conn, _view, _template, _params, _opts) do
     conn
   end
+end
+```
+
+### Sample controller
+
+```
+defmodule GenRouter.Controller.TestController do
+  use GenRouter.Controller
+
+  plug GenRouter.Plug.FetchCommonResource
+  plug GenRouter.Plug.FetchResource when action in [:protected_action]
+
+  @spec index(Conn.t(), any()) :: Conn.t()
+  def index(conn, _opts) do
+    complete(conn, "index")
+  end
+
+  @spec protected_action(Conn.t(), any()) :: Conn.t()
+  def protected_action(conn, _opts) do
+    complete(conn, "protected_action")
+  end
+
+  @spec not_found(GenRouter.Conn.t(), any()) :: GenRouter.Conn.t()
+  def not_found(conn, _opts) do
+    complete(conn, nil, %{}, 404)
+  end
+end
+```
+
+### Sample plug
+
+```
+defmodule GenRouter.Plug.Authorize do
+  @doc false
+  def call(%{assigns: %{authorized: true}} = conn, _opts), do: conn
+  def call(conn, _opts), do: GenRouter.Conn.complete(conn, "forbidden", %{}, 403)
 end
 ```
 

@@ -18,15 +18,15 @@ defmodule GenRouter do
       {_path, controller, action} ->
         conn =
           Enum.reduce(scope_pipeline, conn, fn(pipeline, conn) ->
-            if is_nil(conn.code) do
+            unless conn.halted do
               apply(router_module, pipeline, [conn, opts])
             else
               conn
             end
           end)
 
-        if is_nil(conn.code) do
-          apply(controller, action, [conn, opts])
+        unless conn.halted do
+          apply(controller, :do_action, [action, conn, opts])
         else
           conn
         end
@@ -61,7 +61,11 @@ defmodule GenRouter do
       @default_route_set true
 
       def do_match(%Conn{} = conn, opts) do
-        apply(unquote(controller), unquote(action), [conn, opts])
+        unless conn.halted do
+          apply(unquote(controller), :do_action, [unquote(action), conn, opts])
+        else
+          conn
+        end
       end
 
       def scopes, do: @scopes

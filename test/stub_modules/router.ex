@@ -12,6 +12,7 @@ defmodule GenRouter.Router do
     match "/", TestController, :test1
     match "/test1", TestController, :test1
     match "/test2", TestController, :test2
+    match "/test4", TestController, :test4
   end
 
   scope :test_scope, "/stest" do

@@ -1,5 +1,8 @@
 defmodule GenRouter.Controller.TestController do
-  import GenRouter.Conn
+  use GenRouter.Controller
+
+  plug GenRouter.Plug.FetchCommonResource
+  plug GenRouter.Plug.FetchResource when action in [:test4]
 
   @spec test1(GenRouter.Conn.t(), any()) :: GenRouter.Conn.t()
   def test1(conn, _opts) do
@@ -14,6 +17,11 @@ defmodule GenRouter.Controller.TestController do
   @spec test3(GenRouter.Conn.t(), any()) :: GenRouter.Conn.t()
   def test3(conn, _opts) do
     complete(conn, "TEST3")
+  end
+
+  @spec test4(GenRouter.Conn.t(), any()) :: GenRouter.Conn.t()
+  def test4(conn, _opts) do
+    complete(conn, "TEST4")
   end
 
   @spec not_found(GenRouter.Conn.t(), any()) :: GenRouter.Conn.t()
