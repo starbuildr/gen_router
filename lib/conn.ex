@@ -33,14 +33,12 @@ defmodule GenRouter.Conn do
   """
   @spec build(module(), map()) :: t
   def build(router_module, %{path: path, params: params, assigns: assigns, scope: scope}) do
-    skip_router_scopes = Enum.reduce(router_module.scopes(), %{}, &(Map.put(&2, &1, false)))
     %GenRouter.Conn{
-      __skip__: skip_router_scopes,
       path: path,
       params: params,
       assigns: assigns,
       scope: scope
-    }
+    } |> reset_router_matches(router_module)
   end
 
   @doc """
@@ -74,7 +72,8 @@ defmodule GenRouter.Conn do
       Application.get_env(:gen_router, GenRouter.Conn)
       |> Keyword.fetch!(:default_router)
 
-    %{conn | path: path, scope: scope, code: nil, halted: false}
+    %{conn | path: path, scope: scope, code: 302, halted: false}
+    |> reset_router_matches(router_module)
     |> router_module.do_match(opts)
   end
 
@@ -84,5 +83,14 @@ defmodule GenRouter.Conn do
   @spec halt(t) :: t
   def halt(%GenRouter.Conn{} = conn)  do
     %{conn | halted: true}
+  end
+
+  @doc """
+  Reset router matching pipeline
+  """
+  @spec reset_router_matches(t, module()) :: t
+  def reset_router_matches(conn, router_module) do
+    skip_router_scopes = Enum.reduce(router_module.scopes(), %{}, &(Map.put(&2, &1, false)))
+    %{conn | __skip__: skip_router_scopes}
   end
 end
