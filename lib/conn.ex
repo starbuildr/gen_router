@@ -69,10 +69,11 @@ defmodule GenRouter.Conn do
   """
   @spec forward(t, String.t, map(), Keyword.t) :: t
   def forward(%GenRouter.Conn{} = conn, path \\ "/", scope \\ %{}, opts \\ []) when is_bitstring(path) do
-    default_router =
+    router_module =
+      Keyword.get(opts, :router_module, false) ||
       Application.get_env(:gen_router, GenRouter.Conn)
       |> Keyword.fetch!(:default_router)
-    router_module = Keyword.get(opts, :router_module, default_router)
+
     %{conn | path: path, scope: scope, code: nil, halted: false}
     |> router_module.do_match(opts)
   end

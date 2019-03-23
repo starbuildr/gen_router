@@ -82,12 +82,9 @@ defmodule GenRouter do
     quote do
       @default_route_set true
 
+      def do_match(%Conn{halted: true} = conn, _opts), do: conn
       def do_match(%Conn{} = conn, opts) do
-        unless conn.halted do
-          apply(unquote(controller), :do_action, [unquote(action), conn, opts])
-        else
-          conn
-        end
+        apply(unquote(controller), :do_action, [unquote(action), conn, opts])
       end
 
       def scopes, do: @scopes
