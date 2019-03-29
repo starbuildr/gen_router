@@ -53,9 +53,13 @@ defmodule GenRouter.Conn do
   @doc """
   Update state and complete the current request.
   """
-  @spec complete(t, String.t | nil, map(), integer()) :: t
-  def complete(conn, response \\ nil, scope \\ %{}, code \\ 200)
-  def complete(%GenRouter.Conn{} = conn, response, scope, code) when is_map(scope) and is_integer(code) do
+  @spec complete(t, String.t | nil | :default, map() | :default, integer() | :default) :: t
+  def complete(conn, response \\ :default, scope \\ :default, code \\ :default)
+  def complete(%GenRouter.Conn{} = conn, response, scope, code)
+  when (is_map(scope) or scope === :default) and (is_integer(code) or code === :default) do
+    response = from_conn_or_default(conn, :response, response)
+    scope = from_conn_or_default(conn, :scope, scope)
+    code = from_conn_or_default(conn, :code, code)
     %{conn | response: response, scope: scope, code: code}
     |> halt()
   end
@@ -93,4 +97,12 @@ defmodule GenRouter.Conn do
     skip_router_scopes = Enum.reduce(router_module.scopes(), %{}, &(Map.put(&2, &1, false)))
     %{conn | __skip__: skip_router_scopes}
   end
+
+  @spec from_conn_or_default(t, :response | :scope | :code, any()) :: any()
+  defp from_conn_or_default(conn, :response, :default), do: conn.response
+  defp from_conn_or_default(_conn, :response, response), do: response
+  defp from_conn_or_default(conn, :scope, :default), do: conn.scope
+  defp from_conn_or_default(_conn, :scope, scope), do: scope || %{}
+  defp from_conn_or_default(conn, :code, :default), do: conn.code || 200
+  defp from_conn_or_default(_conn, :code, code), do: code || 200
 end
