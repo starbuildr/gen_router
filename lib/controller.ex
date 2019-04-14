@@ -45,7 +45,9 @@ defmodule GenRouter.Controller do
       @spec do_action(atom(), Conn.t, Keyword.t) :: Conn.t
       def do_action(action, conn, opts \\ []) do
         conn =
-          Enum.reduce(plugs(), conn, fn {plug, plug_opts, guards}, conn ->
+          plugs()
+          |> Enum.reverse()
+          |> Enum.reduce(conn, fn {plug, plug_opts, guards}, conn ->
             guards =
               if is_boolean(guards) do
                 guards
