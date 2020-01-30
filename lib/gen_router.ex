@@ -103,7 +103,7 @@ defmodule GenRouter do
     path =
       if String.contains?(path, ":") do
         "^" <> path <> "$"
-        |> String.replace(~r/:([0-9a-z_\-]+)/, "(?<\\g{1}>[0-9a-z_\-]+)")
+        |> String.replace(~r/:([0-9a-z_\-]+)/, "(?<\\g{1}>[\s0-9a-zA-Z_\-]+)")
         |> Regex.compile!()
         |> Macro.escape()
       else
