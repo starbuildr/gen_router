@@ -42,7 +42,7 @@ defmodule GenRouter.Controller do
       @doc """
       Do matching to a proper controller action.
       """
-      @spec do_action(atom(), Conn.t, Keyword.t) :: Conn.t
+      @spec do_action(atom(), Conn.t(), Keyword.t()) :: Conn.t()
       def do_action(action, conn, opts \\ []) do
         conn =
           plugs()
@@ -55,6 +55,7 @@ defmodule GenRouter.Controller do
                 {[guards], _} = Code.eval_quoted(guards, action: action)
                 guards
               end
+
             if guards do
               apply(plug, :call, [conn, plug_opts])
             else

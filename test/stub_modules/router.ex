@@ -3,32 +3,32 @@ defmodule GenRouter.Router do
   alias GenRouter.Controller.TestController
 
   pipeline :authed do
-    plug GenRouter.Plug.Authorize
+    plug(GenRouter.Plug.Authorize)
   end
 
   scope :default, "/" do
-    pipe_through [:authed]
+    pipe_through([:authed])
 
-    match "/", TestController, :test1
-    match "/test1", TestController, :test1
-    match "/test2", TestController, :test2
-    match "/test4", TestController, :test4
-    match "/test5/:name/i/:id", TestController, :test5
+    match("/", TestController, :test1)
+    match("/test1", TestController, :test1)
+    match("/test2", TestController, :test2)
+    match("/test4", TestController, :test4)
+    match("/test5/:name/i/:id", TestController, :test5)
   end
 
   scope :test_scope, "/stest" do
-    pipe_through [:authed]
+    pipe_through([:authed])
 
-    match "/", TestController, :test3
+    match("/", TestController, :test3)
   end
 
   scope :test_complex_scope, "/stest/complex" do
-    pipe_through [:authed]
+    pipe_through([:authed])
 
-    match "/", TestController, :test2
+    match("/", TestController, :test2)
   end
 
-  match "*", TestController, :not_found
+  match("*", TestController, :not_found)
 
   @impl true
   def match_message(router_module, message, path, scope, assigns, opts) do
@@ -39,6 +39,7 @@ defmodule GenRouter.Router do
         assigns: assigns,
         scope: scope
       })
+
     router_module.do_match(conn, opts)
   end
 

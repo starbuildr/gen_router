@@ -4,14 +4,15 @@ defmodule GenRouter.MixProject do
   def project do
     [
       app: :gen_router,
-      version: "0.1.6",
+      version: "0.1.7",
       elixir: "~> 1.6",
-      description: "Elixir library to handle generic routing tasks in Plug.Router and Phoenix router style",
+      description:
+        "Elixir library to handle generic routing tasks in Plug.Router and Phoenix router style",
       docs: [extras: ["README.md"]],
       start_permanent: Mix.env() == :prod,
-      build_embedded: Mix.env == :prod,
+      build_embedded: Mix.env() == :prod,
       package: package(),
-      elixirc_paths: elixirc_paths(Mix.env),
+      elixirc_paths: elixirc_paths(Mix.env()),
       deps: deps()
     ]
   end
@@ -22,7 +23,7 @@ defmodule GenRouter.MixProject do
       files: ["lib", "mix.exs"],
       maintainers: ["Vyacheslav Voronchuk"],
       licenses: ["MIT"],
-      links: %{"Github" => "https://github.com/starbuildr/gen_router"},
+      links: %{"Github" => "https://github.com/starbuildr/gen_router"}
     ]
   end
 

@@ -11,7 +11,14 @@ defmodule GenRouterTest do
         assigns: %{},
         opts: []
       }
-      assert GenRouter.Router.match_message(msg.message, msg.path, msg.scope, msg.assigns, msg.opts).code === 403
+
+      assert GenRouter.Router.match_message(
+               msg.message,
+               msg.path,
+               msg.scope,
+               msg.assigns,
+               msg.opts
+             ).code === 403
     end
 
     test "with authed access" do
@@ -22,7 +29,14 @@ defmodule GenRouterTest do
         assigns: %{authorized: true},
         opts: []
       }
-      assert GenRouter.Router.match_message(msg.message, msg.path, msg.scope, msg.assigns, msg.opts).response === "TEST1"
+
+      assert GenRouter.Router.match_message(
+               msg.message,
+               msg.path,
+               msg.scope,
+               msg.assigns,
+               msg.opts
+             ).response === "TEST1"
     end
 
     test "for non-default route in first scope" do
@@ -33,7 +47,14 @@ defmodule GenRouterTest do
         assigns: %{authorized: true},
         opts: []
       }
-      assert GenRouter.Router.match_message(msg.message, msg.path, msg.scope, msg.assigns, msg.opts).response === "TEST2"
+
+      assert GenRouter.Router.match_message(
+               msg.message,
+               msg.path,
+               msg.scope,
+               msg.assigns,
+               msg.opts
+             ).response === "TEST2"
     end
 
     test "for route in second scope" do
@@ -44,7 +65,14 @@ defmodule GenRouterTest do
         assigns: %{authorized: true},
         opts: []
       }
-      assert GenRouter.Router.match_message(msg.message, msg.path, msg.scope, msg.assigns, msg.opts).response === "TEST3"
+
+      assert GenRouter.Router.match_message(
+               msg.message,
+               msg.path,
+               msg.scope,
+               msg.assigns,
+               msg.opts
+             ).response === "TEST3"
     end
 
     test "for route in complex scope" do
@@ -55,7 +83,14 @@ defmodule GenRouterTest do
         assigns: %{authorized: true},
         opts: []
       }
-      assert GenRouter.Router.match_message(msg.message, msg.path, msg.scope, msg.assigns, msg.opts).response === "TEST2"
+
+      assert GenRouter.Router.match_message(
+               msg.message,
+               msg.path,
+               msg.scope,
+               msg.assigns,
+               msg.opts
+             ).response === "TEST2"
     end
 
     test "for route with guarded plug in controller" do
@@ -66,7 +101,10 @@ defmodule GenRouterTest do
         assigns: %{authorized: true},
         opts: []
       }
-      conn = GenRouter.Router.match_message(msg.message, msg.path, msg.scope, msg.assigns, msg.opts)
+
+      conn =
+        GenRouter.Router.match_message(msg.message, msg.path, msg.scope, msg.assigns, msg.opts)
+
       assert conn.response === "TEST4"
       assert conn.assigns.user
       assert conn.assigns.common
@@ -80,7 +118,10 @@ defmodule GenRouterTest do
         assigns: %{authorized: true},
         opts: []
       }
-      conn = GenRouter.Router.match_message(msg.message, msg.path, msg.scope, msg.assigns, msg.opts)
+
+      conn =
+        GenRouter.Router.match_message(msg.message, msg.path, msg.scope, msg.assigns, msg.opts)
+
       assert conn.response === "TEST2"
       refute conn.assigns[:user]
       assert conn.assigns.common
@@ -94,7 +135,10 @@ defmodule GenRouterTest do
         assigns: %{authorized: true},
         opts: []
       }
-      conn = GenRouter.Router.match_message(msg.message, msg.path, msg.scope, msg.assigns, msg.opts)
+
+      conn =
+        GenRouter.Router.match_message(msg.message, msg.path, msg.scope, msg.assigns, msg.opts)
+
       assert conn.response === "acme5"
     end
   end

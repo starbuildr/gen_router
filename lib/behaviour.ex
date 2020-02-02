@@ -5,14 +5,14 @@ defmodule GenRouter.Behaviour do
 
   @type router :: module()
   @type message :: map()
-  @type path :: String.t
+  @type path :: String.t()
   @type scope :: map()
   @type assigns :: map()
 
   @type view :: module()
-  @type template :: String.t
+  @type template :: String.t()
   @type params :: map()
-  @type opts :: Keyword.t
+  @type opts :: Keyword.t()
 
   @doc """
   Function which converts generic message into GenRouter.Conn structure
