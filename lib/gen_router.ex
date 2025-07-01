@@ -121,10 +121,10 @@ defmodule GenRouter do
   defmacro match(path, controller, action) do
     path =
       if String.contains?(path, ":") do
-        ("^" <> path <> "$")
+        regex_source = ("^" <> path <> "$")
         |> String.replace(~r/:([0-9a-z_\-]+)/, "(?<\\g{1}>[^/]+)")
-        |> Regex.compile!()
-        |> Macro.escape()
+
+        quote do: Regex.compile!(unquote(regex_source))
       else
         path
       end
@@ -265,7 +265,7 @@ defmodule GenRouter do
           assigns: assigns,
           scope: scope
         })
-        
+
         __MODULE__.do_match(conn, opts)
       end
     end
