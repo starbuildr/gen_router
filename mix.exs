@@ -4,8 +4,8 @@ defmodule GenRouter.MixProject do
   def project do
     [
       app: :gen_router,
-      version: "0.1.7",
-      elixir: "~> 1.6",
+      version: "0.1.8",
+      elixir: "~> 1.18",
       description:
         "Elixir library to handle generic routing tasks in Plug.Router and Phoenix router style",
       docs: [extras: ["README.md"]],

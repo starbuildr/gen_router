@@ -259,7 +259,14 @@ defmodule GenRouter do
       """
       @spec match_message(map(), String.t(), map(), map(), Keyword.t()) :: Conn.t()
       def match_message(message, path, scope \\ %{}, assigns \\ %{}, opts \\ []) do
-        __MODULE__.match_message(__MODULE__, message, path, scope, assigns, opts)
+        conn = GenRouter.Conn.build(__MODULE__, %{
+          path: path,
+          params: message,
+          assigns: assigns,
+          scope: scope
+        })
+        
+        __MODULE__.do_match(conn, opts)
       end
     end
   end
